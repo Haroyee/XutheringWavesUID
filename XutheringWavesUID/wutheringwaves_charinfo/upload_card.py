@@ -51,7 +51,7 @@ def get_char_id_and_name(char: str) -> tuple[Optional[str], str, str]:
 
     if char_id in SPECIAL_CHAR:
         if not sex:
-            msg1 = f"[鸣潮] 主角面板【{char}】需要指定性别！\n"
+            msg1 = f"[鸣潮] 主角【{char}】需要指定性别！\n"
             return char_id, char, msg1
         char_id = SPECIAL_CHAR_ID[f"{char}·{sex}"]
 
@@ -88,7 +88,7 @@ async def upload_custom_card(bot: Bot, ev: Event, char: str, target_type: str = 
     upload_images = await get_image(ev)
     if not upload_images:
         return await bot.send(
-            "[鸣潮] 上传角色面板图失败\n请同时发送图片及其命令\n", at_sender
+            f"[鸣潮] 上传角色{target_type}图失败\n请同时发送图片及其命令\n", at_sender
         )
 
     char_id, char, msg = get_char_id_and_name(char)
@@ -122,9 +122,9 @@ async def upload_custom_card(bot: Bot, ev: Event, char: str, target_type: str = 
                 break
 
     if success:
-        return await bot.send(f"[鸣潮]【{char}】上传面板图成功！\n", at_sender)
+        return await bot.send(f"[鸣潮]【{char}】上传{target_type}图成功！\n", at_sender)
     else:
-        return await bot.send(f"[鸣潮]【{char}】上传面板图失败！\n", at_sender)
+        return await bot.send(f"[鸣潮]【{char}】上传{target_type}图失败！\n", at_sender)
 
 
 async def get_custom_card_list(bot: Bot, ev: Event, char: str, target_type: str = "card"):
@@ -135,7 +135,7 @@ async def get_custom_card_list(bot: Bot, ev: Event, char: str, target_type: str 
 
     temp_dir = CUSTOM_PATH_MAP.get(target_type, CUSTOM_CARD_PATH) / f"{char_id}"
     if not temp_dir.exists():
-        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过面板图！\n", at_sender)
+        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过{target_type}图！\n", at_sender)
 
     # 获取角色文件夹图片数量, 只要图片
     files = [
@@ -148,7 +148,7 @@ async def get_custom_card_list(bot: Bot, ev: Event, char: str, target_type: str 
     for index, f in enumerate(files, start=1):
         img = await convert_img(f)
         hash_id = get_hash_id(f.name)
-        imgs.append(f"{char}面板图id : {hash_id}")
+        imgs.append(f"{char}{target_type}图id : {hash_id}")
         imgs.append(img)
 
     # imgs 5个一组
@@ -166,7 +166,7 @@ async def delete_custom_card(bot: Bot, ev: Event, char: str, hash_id: str, targe
 
     temp_dir = CUSTOM_PATH_MAP.get(target_type, CUSTOM_CARD_PATH) / f"{char_id}"
     if not temp_dir.exists():
-        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过面板图！\n", at_sender)
+        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过{target_type}图！\n", at_sender)
 
     files_map = {
         get_hash_id(f.name): f
@@ -176,14 +176,14 @@ async def delete_custom_card(bot: Bot, ev: Event, char: str, hash_id: str, targe
 
     if hash_id not in files_map:
         return await bot.send(
-            f"[鸣潮] 角色【{char}】未找到id为【{hash_id}】的面板图！\n", at_sender
+            f"[鸣潮] 角色【{char}】未找到id为【{hash_id}】的{target_type}图！\n", at_sender
         )
 
     # 删除文件
     try:
         files_map[hash_id].unlink()
         return await bot.send(
-            f"[鸣潮] 删除角色【{char}】的id为【{hash_id}】的面板图成功！\n", at_sender
+            f"[鸣潮] 删除角色【{char}】的id为【{hash_id}】的{target_type}图成功！\n", at_sender
         )
     except Exception:
         return
@@ -197,7 +197,7 @@ async def delete_all_custom_card(bot: Bot, ev: Event, char: str, target_type: st
 
     temp_dir = CUSTOM_PATH_MAP.get(target_type, CUSTOM_CARD_PATH) / f"{char_id}"
     if not temp_dir.exists():
-        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过面板图！\n", at_sender)
+        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过{target_type}图！\n", at_sender)
 
     files_map = {
         get_hash_id(f.name): f
@@ -206,7 +206,7 @@ async def delete_all_custom_card(bot: Bot, ev: Event, char: str, target_type: st
     }
 
     if len(files_map) == 0:
-        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过面板图！\n", at_sender)
+        return await bot.send(f"[鸣潮] 角色【{char}】暂未上传过{target_type}图！\n", at_sender)
 
     # 删除文件夹包括里面的内容
     try:
@@ -215,7 +215,7 @@ async def delete_all_custom_card(bot: Bot, ev: Event, char: str, target_type: st
     except Exception:
         pass
 
-    return await bot.send(f"[鸣潮] 删除角色【{char}】的所有面板图成功！\n", at_sender)
+    return await bot.send(f"[鸣潮] 删除角色【{char}】的所有{target_type}图成功！\n", at_sender)
 
 
 async def compress_all_custom_card(bot: Bot, ev: Event):
