@@ -393,7 +393,7 @@ async def _draw_stamina_img(ev: Event, valid: Dict) -> Image.Image:
 
     # info 放在背景上
     if ShowConfig.get_config("MrUseBG") and has_bg:
-        img.paste(info, info.split()[-1].point(lambda x: x * 0.75), (0, 190))
+        img.paste(info, (0, 190), info.split()[-1].point(lambda x: x * 0.75))
     else:
         img.paste(info, (0, 190), info)
     # base_info 放在背景上
