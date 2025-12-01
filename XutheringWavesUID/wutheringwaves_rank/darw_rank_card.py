@@ -1,4 +1,3 @@
-from PIL.Image import Image
 import asyncio
 import time
 from pathlib import Path
