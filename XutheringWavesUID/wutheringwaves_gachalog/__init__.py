@@ -20,7 +20,7 @@ from ..utils.waves_api import waves_api
 from ..wutheringwaves_config import PREFIX
 from .draw_gachalogs import draw_card, draw_card_help
 from .get_gachalogs import export_gachalogs, import_gachalogs, save_gachalogs
-from .gacha_handler import fetch_sanyueqi_data, merge_gacha_data
+from .gacha_handler import fetch_mcgf_data, merge_gacha_data
 from ..wutheringwaves_rank.draw_gacha_rank_card import draw_gacha_rank_card
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
 
@@ -80,7 +80,7 @@ async def get_gacha_log_by_link(bot: Bot, ev: Event):
         target_uid = raw
                 
         try:
-            latest_data = await fetch_sanyueqi_data(target_uid)
+            latest_data = await fetch_mcgf_data(target_uid)
             if not latest_data:
                 return await bot.send("获取工坊数据失败或数据为空")
             
@@ -244,25 +244,22 @@ async def delete_gacha_history(bot: Bot, ev: Event):
     await bot.send(f"UID{uid}抽卡记录已删除")
 
 
-@sv_delete_import_gacha_log.on_command(("删除抽卡导入", "删除导入记录", "删除导入抽卡"), block=True)
+@sv_delete_import_gacha_log.on_command(
+    ("删除抽卡导入", "删除导入记录", "删除导入抽卡"), block=True
+)
 async def delete_import_gacha_files(bot: Bot, ev: Event):
-    uid = ev.text.strip()
-    if not uid.isdigit() or len(uid) != 9:
-        return await bot.send("请在命令后附带9位特征码，例如【删除抽卡导入123456789】")
-
-    player_dir = PLAYER_PATH / uid
-    if not player_dir.exists():
-        return await bot.send(f"UID{uid}不存在玩家目录")
-
     delete_count = 0
-    for file_path in player_dir.glob("import_gacha_logs_*.json"):
-        try:
-            file_path.unlink()
-            delete_count += 1
-        except Exception as e:
-            await bot.logger.warning(f"删除导入记录失败 {file_path}: {e}")
+    for player_dir in PLAYER_PATH.iterdir():
+        if not player_dir.is_dir():
+            continue
+        for file_path in player_dir.glob("import_gacha_logs_*.json"):
+            try:
+                file_path.unlink()
+                delete_count += 1
+            except Exception as e:
+                await bot.logger.warning(f"删除导入记录失败 {file_path}: {e}")
 
-    await bot.send(f"UID{uid}删除导入记录{delete_count}个")
+    await bot.send(f"删除导入记录{delete_count}个")
 
 
 @sv_gacha_rank.on_command(

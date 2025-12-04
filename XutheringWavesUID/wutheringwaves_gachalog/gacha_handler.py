@@ -49,7 +49,7 @@ def get_timestamp_minus_1s(time_str):
     except ValueError:
         return time_str
 
-async def fetch_sanyueqi_data(uid: str):
+async def fetch_mcgf_data(uid: str):
     url = "https://api3.sanyueqi.cn/api/v2/game_user/get_sr_draw_v3"
     current_time_ms = str(int(time.time() * 1000))
     random_union_id = generate_union_id()
@@ -75,7 +75,8 @@ async def fetch_sanyueqi_data(uid: str):
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Dest": "empty",
         "Referer": "https://servicewechat.com/wx715e22143bcda767/36/page-frame.html",
-        "Accept-Language": "zh-CN,zh;q=0.9"
+        "Accept-Language": "zh-CN,zh;q=0.9",
+        "WWUIDMSG": "We welcome data sharing. We can also provide method to import wwuid gacha data into your mini program."
     }
 
     try:
