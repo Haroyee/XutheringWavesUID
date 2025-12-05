@@ -94,6 +94,9 @@ async def get_gacha_log_by_link(bot: Bot, ev: Event):
                 import aiofiles
                 async with aiofiles.open(export_res["url"], "r", encoding="utf-8") as f:
                     original_data = json.loads(await f.read())
+                    
+            if len(original_data.get("list", [])) == 0:
+                return await bot.send("当前无抽卡记录，无法合并，请先导入抽卡记录后再尝试合并！")
             
             # 合并数据
             merged_data = await asyncio.to_thread(merge_gacha_data, original_data, latest_data)
