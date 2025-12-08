@@ -36,11 +36,6 @@ def get_valid_color(*args, **kwargs) -> Tuple[str, str]:
 
     return _func(*args, **kwargs)
 
-# try:
-#     from .waves_build.calculate import *
-# except ImportError:
-#     logger.warning("无法导入 calculate，将尝试下载")
-
 import importlib        
         
 def reload_calculate_module():

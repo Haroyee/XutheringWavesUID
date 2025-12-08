@@ -113,6 +113,7 @@ def init_dir():
         MAP_ALIAS_PATH,
         CUSTOM_MR_CARD_PATH,
         CUSTOM_MR_BG_PATH,
+        ALIAS_PATH,
     ]:
         i.mkdir(parents=True, exist_ok=True)
 
