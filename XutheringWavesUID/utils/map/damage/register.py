@@ -90,14 +90,6 @@ def register_damage(reload=False):
 def register_rank(reload=False):
     _dynamic_load_and_register(attr_name="rank", register_cls=DamageRankRegister, force_reload=reload)
 
-
-try:
-    register_damage(reload=False)
-    register_rank(reload=False)
-except Exception:
-    logger.warning("无法导入 计算模块，将尝试下载")
-
-
 def reload_all_register():
     register_damage(reload=True)
     register_rank(reload=True)

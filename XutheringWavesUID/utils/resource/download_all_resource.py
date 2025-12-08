@@ -121,14 +121,7 @@ async def download_all_resource(force: bool = False):
         "小维资源",
     )
 
-    if "win" in PLATFORM:
-        logger.warning(
-            "如下载失败原因为 Permission Denied, 请手动删除 ./XutheringWavesUID/utils/waves_build 和 ./XutheringWavesUID/utils/map/waves_build 文件夹后重试，或尝试 强制下载全部资源"
-        )
-
 def reload_all_modules():
-    from ..safety import reload_safety_module
-    from ..calculate import reload_calculate_module
 
     # 强制加载所有 map 数据
     from ..name_convert import ensure_data_loaded as ensure_name_convert_loaded
@@ -136,13 +129,8 @@ def reload_all_modules():
     from ..ascension.echo import ensure_data_loaded as ensure_echo_loaded
     from ..ascension.sonata import ensure_data_loaded as ensure_sonata_loaded
     from ..ascension.weapon import ensure_data_loaded as ensure_weapon_loaded
-    from ..map.damage.damage import reload_damage_module
     from ..map.damage.register import reload_all_register
 
-    # no async
-    reload_calculate_module()
-    reload_safety_module()
-    reload_damage_module()
     reload_all_register()
 
     # 在下载完成后强制加载所有数据

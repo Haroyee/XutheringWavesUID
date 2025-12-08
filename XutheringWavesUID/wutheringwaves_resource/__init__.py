@@ -27,7 +27,7 @@ def get_dir_hash(dir_path):
 
 
 def copy_if_different(src, dst, name):
-    """比较两个目录的内容哈希值，仅在不同时复制"""
+    """比较两个目录的内容哈希值，仅在不同时复制，返回是否有更新"""
     src_hash = get_dir_hash(src)
     dst_hash = get_dir_hash(dst)
 
@@ -35,26 +35,42 @@ def copy_if_different(src, dst, name):
         logger.info(f"[鸣潮] {name} 内容不同，开始更新...")
         shutil.copytree(src, dst, dirs_exist_ok=True)
         logger.info(f"[鸣潮] {name} 更新完成！")
+        return True
     else:
         logger.debug(f"[鸣潮] {name} 内容相同，无需更新")
+        return False
 
 sv_download_config = SV("ww资源下载", pm=1)
 
 
 @sv_download_config.on_fullmatch(("强制下载全部资源", "下载全部资源", "补充资源", "刷新补充资源"))
 async def send_download_resource_msg(bot: Bot, ev: Event):
+    build_updated = copy_if_different(BUILD_TEMP, BUILD_PATH, "安全工具资源")
+    map_updated = copy_if_different(MAP_BUILD_TEMP, MAP_BUILD_PATH, "伤害计算资源")
+    
     await bot.send("[鸣潮] 正在开始下载~可能需要较久的时间！请勿重复执行！")
     await download_all_resource(force="强制" in ev.raw_text)
-    copy_if_different(BUILD_TEMP, BUILD_PATH, "安全工具资源")
-    copy_if_different(MAP_BUILD_TEMP, MAP_BUILD_PATH, "伤害计算资源")
-    reload_all_modules()
-    await bot.send("[鸣潮] 下载完成！")
+
+    if build_updated or map_updated:
+        await bot.send("[鸣潮] 构建文件已更新，应用需要重启...")
+        from gsuid_core.buildin_plugins.core_command.core_restart.restart import restart_genshinuid
+        await restart_genshinuid(event=ev, is_send=True)
+    else:
+        reload_all_modules()
+        await bot.send("[鸣潮] 下载完成！")
 
 
 async def startup():
+    build_updated = copy_if_different(BUILD_TEMP, BUILD_PATH, "安全工具资源")
+    map_updated = copy_if_different(MAP_BUILD_TEMP, MAP_BUILD_PATH, "伤害计算资源")
+    
     logger.info("[鸣潮] 等待资源下载完成...")
     await download_all_resource()
-    copy_if_different(BUILD_TEMP, BUILD_PATH, "安全工具资源")
-    copy_if_different(MAP_BUILD_TEMP, MAP_BUILD_PATH, "伤害计算资源")
-    reload_all_modules()
+    
+    if build_updated or map_updated:
+        from gsuid_core.buildin_plugins.core_command.core_restart.restart import restart_genshinuid
+        await restart_genshinuid(is_send=False)
+    else:
+        reload_all_modules()
+
     logger.info("[鸣潮] 资源下载完成！完成启动！")
