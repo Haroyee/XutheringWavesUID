@@ -10,28 +10,36 @@ from pathlib import Path
 from ..utils.resource.download_all_resource import (download_all_resource, reload_all_modules, BUILD_PATH, BUILD_TEMP, MAP_BUILD_PATH, MAP_BUILD_TEMP)
 
 
-def get_dir_hash(dir_path):
-    """用于比较内容是否相同"""
-    if not os.path.exists(dir_path):
-        return ""
-
+def get_file_hash(file_path):
+    """计算单个文件的哈希值"""
     hash_md5 = hashlib.md5()
-
-    for filepath in sorted(Path(dir_path).rglob('*')):
-        if filepath.is_file():
-            with open(filepath, 'rb') as f:
-                hash_md5.update(f.read())
-            hash_md5.update(str(filepath.relative_to(dir_path)).encode())
-
+    with open(file_path, 'rb') as f:
+        hash_md5.update(f.read())
     return hash_md5.hexdigest()
 
 
 def copy_if_different(src, dst, name):
-    """比较两个目录的内容哈希值，仅在不同时复制，返回是否有更新"""
-    src_hash = get_dir_hash(src)
-    dst_hash = get_dir_hash(dst)
+    """复制并返回是否有更新"""
+    if not os.path.exists(src):
+        logger.debug(f"[鸣潮] {name} 源目录不存在")
+        return False
 
-    if src_hash != dst_hash:
+    needs_update = False
+
+    for src_file in sorted(Path(src).rglob('*')):
+        if src_file.is_file():
+            rel_path = src_file.relative_to(src)
+            dst_file = Path(dst) / rel_path
+
+            if not dst_file.exists():
+                needs_update = True
+                break
+
+            if get_file_hash(src_file) != get_file_hash(dst_file):
+                needs_update = True
+                break
+
+    if needs_update:
         logger.info(f"[鸣潮] {name} 内容不同，开始更新...")
         shutil.copytree(src, dst, dirs_exist_ok=True)
         logger.info(f"[鸣潮] {name} 更新完成！")

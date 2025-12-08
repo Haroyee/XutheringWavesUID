@@ -131,11 +131,11 @@ def reload_all_modules():
     from ..ascension.weapon import ensure_data_loaded as ensure_weapon_loaded
     from ..map.damage.register import reload_all_register
 
-    reload_all_register()
-
     # 在下载完成后强制加载所有数据
     ensure_name_convert_loaded(force=True)
     ensure_char_loaded(force=True)
     ensure_weapon_loaded(force=True)
     ensure_echo_loaded(force=True)
     ensure_sonata_loaded(force=True)
+
+    reload_all_register()
