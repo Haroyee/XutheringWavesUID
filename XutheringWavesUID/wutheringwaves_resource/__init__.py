@@ -7,8 +7,8 @@ import os
 import hashlib
 from pathlib import Path
 
-from ..utils.resource.download_all_resource import (download_all_resource, reload_all_modules, BUILD_PATH, BUILD_TEMP, MAP_BUILD_PATH, MAP_BUILD_TEMP)
-
+from ..utils.resource.download_all_resource import download_all_resource, reload_all_modules
+from ..utils.resource.RESOURCE_PATH import BUILD_PATH, BUILD_TEMP, MAP_BUILD_PATH, MAP_BUILD_TEMP
 
 def get_file_hash(file_path):
     """计算单个文件的哈希值"""
