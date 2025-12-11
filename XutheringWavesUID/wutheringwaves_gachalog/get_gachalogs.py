@@ -109,15 +109,16 @@ def merge_gacha_logs_by_common_subarray(a: List[GachaLog], b: List[GachaLog]) ->
 
 async def get_new_gachalog(
     uid: str, record_id: str, full_data: Dict[str, List[GachaLog]], is_force: bool
-) -> tuple[Union[str, None], Dict[str, List[GachaLog]], Dict[str, int]]:
+) -> tuple[Union[str, None], Dict[str, List[GachaLog]], Dict[str, int], Dict[str, List[GachaLog]]]:
     new = {}
     new_count = {}
+    link_source_data: Dict[str, List[GachaLog]] = {}
     for gacha_name, card_pool_type in gacha_type_meta_data.items():
         res = await waves_api.get_gacha_log(card_pool_type, record_id, uid)
         if not res.success or not res.data:
             # 抽卡记录获取失败
             if res.code == -1:  # type: ignore
-                return ERROR_MSG_INVALID_LINK, None, None  # type: ignore
+                return ERROR_MSG_INVALID_LINK, None, None, {}  # type: ignore
 
         if res.data and isinstance(res.data, list):
             temp = res.data
@@ -128,13 +129,14 @@ async def get_new_gachalog(
         for log in gacha_log:
             if log.cardPoolType != card_pool_type:
                 log.cardPoolType = card_pool_type
+        link_source_data[gacha_name] = list(gacha_log)
         old_length = find_length(full_data[gacha_name], gacha_log)
         _add = gacha_log if old_length == 0 else gacha_log[:-old_length]
         new[gacha_name] = _add + copy.deepcopy(full_data[gacha_name])
         new_count[gacha_name] = len(_add)
         await asyncio.sleep(1)
 
-    return None, new, new_count
+    return None, new, new_count, link_source_data
 
 
 async def get_new_gachalog_for_file(
@@ -170,6 +172,23 @@ async def backup_gachalogs(uid: str, gachalogs_history: Dict, type: str):
     backup_path = path / f"{type}_gacha_logs_{datetime.now().strftime('%Y-%m-%d.%H%M%S')}.json"
     async with aiofiles.open(backup_path, "w", encoding="UTF-8") as file:
         await file.write(json.dumps(gachalogs_history, ensure_ascii=False))
+
+
+async def save_link_source_gachalogs(uid: str, record_id: str, data: Dict[str, List[GachaLog]]):
+    """保存通过链接获取的抽卡原始数据"""
+    path = PLAYER_PATH / str(uid)
+    if not path.exists():
+        path.mkdir(parents=True, exist_ok=True)
+
+    content = {
+        "uid": uid,
+        "record_id": record_id,
+        "fetch_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "data": {gacha_name: [log.dict() for log in logs] for gacha_name, logs in data.items()},
+    }
+
+    async with aiofiles.open(path / "link_gacha_logs.json", "w", encoding="UTF-8") as file:
+        await file.write(json.dumps(content, ensure_ascii=False, indent=2))
 
 
 async def save_gachalogs(
@@ -230,8 +249,11 @@ async def save_gachalogs(
     for gacha_name in gacha_type_meta_data.keys():
         gachalogs_history[gacha_name] = [GachaLog(**log) for log in gachalogs_history[gacha_name]]
 
+    link_source_data: Dict[str, List[GachaLog]] = {}
     if record_id:
-        code, gachalogs_new, gachalogs_count_add = await get_new_gachalog(uid, record_id, gachalogs_history, is_force)
+        code, gachalogs_new, gachalogs_count_add, link_source_data = await get_new_gachalog(
+            uid, record_id, gachalogs_history, is_force
+        )
     elif not force_overwrite:
         code, gachalogs_new, gachalogs_count_add = await get_new_gachalog_for_file(
             gachalogs_history,
@@ -248,6 +270,8 @@ async def save_gachalogs(
 
     if record_id:
         await save_record_id(ev.user_id, ev.bot_id, uid, record_id)
+        if link_source_data:
+            await save_link_source_gachalogs(uid, record_id, link_source_data)
 
     # 获取当前时间
     current_time = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
