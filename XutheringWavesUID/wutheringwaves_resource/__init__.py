@@ -55,12 +55,11 @@ def copy_if_different(src, dst, name):
                 break
 
     if needs_update:
-        logger.info(f"[鸣潮] {name} 内容不同，开始更新...")
         shutil.copytree(src, dst, dirs_exist_ok=True)
         logger.info(f"[鸣潮] {name} 更新完成！")
         return True
     else:
-        logger.debug(f"[鸣潮] {name} 内容相同，无需更新")
+        logger.debug(f"[鸣潮] {name} 无需更新")
         return False
 
 sv_download_config = SV("ww资源下载", pm=1)
@@ -75,7 +74,7 @@ async def send_download_resource_msg(bot: Bot, ev: Event):
     await download_all_resource(force="强制" in ev.raw_text)
 
     if build_updated or map_updated:
-        await bot.send("[鸣潮] 构建文件已更新，应用需要重启...")
+        await bot.send("[鸣潮] 构建文件已更新，需要重启...")
         from gsuid_core.buildin_plugins.core_command.core_restart.restart import restart_genshinuid
         await restart_genshinuid(event=ev, is_send=True)
     else:
