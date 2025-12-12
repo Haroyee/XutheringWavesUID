@@ -133,12 +133,15 @@ class WavesApi:
                 # "user_id": waves_user.user_id,
                 # "bot_id": waves_user.bot_id,
                 "uid": waves_user.uid,
+                "game_id": waves_user.game_id,
             },
             update_data={"bat": access_token},
         )
         return waves_user
 
-    async def get_used_headers(self, cookie: str, uid: str, needToken=False) -> Dict[str, Any]:
+    async def get_used_headers(
+        self, cookie: str, uid: str, needToken=False, game_id: Optional[int] = WAVES_GAME_ID
+    ) -> Dict[str, Any]:
         headers = {
             # "token": cookie,
             "did": "",
@@ -149,6 +152,7 @@ class WavesApi:
         waves_user: Optional[WavesUser] = await WavesUser.select_data_by_cookie_and_uid(
             cookie=cookie,
             uid=uid,
+            game_id=game_id,
         ) or await WavesUser.select_data_by_cookie(
             cookie=cookie,
         )
@@ -173,7 +177,7 @@ class WavesApi:
 
     async def get_self_waves_ck(self, uid: str, user_id: str, bot_id: str) -> Optional[str]:
         # 返回空串 表示绑定已失效
-        waves_user = await WavesUser.select_waves_user(uid, user_id, bot_id)
+        waves_user = await WavesUser.select_waves_user(uid, user_id, bot_id, game_id=WAVES_GAME_ID)
         if not waves_user or not waves_user.cookie:
             return ""
 

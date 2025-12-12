@@ -26,6 +26,7 @@ from ..utils.database.models import WavesBind, WavesUser
 from ..wutheringwaves_config import PREFIX, WutheringWavesConfig
 from ..utils.resource.RESOURCE_PATH import waves_templates
 from ..wutheringwaves_user.login_succ import login_success_msg
+from ..utils.api.api import WAVES_GAME_ID
 
 cache = TimedCache(timeout=600, maxsize=10)
 
@@ -75,7 +76,7 @@ async def send_login(bot: Bot, ev: Event, url):
 
         im = [
             f"{game_title} 您的id为【{ev.user_id}】\n",
-            "请扫描下方二维码获取登录地址，并复制地址到浏览器打开\n",
+            "请扫描下方二维码获取登录地址，登录将刷新全部面板，无需立即刷新\n",
             MessageSegment.image(await get_qrcode_base64(url, path, ev.bot_id)),
         ]
 
@@ -95,7 +96,7 @@ async def send_login(bot: Bot, ev: Event, url):
             url = f"https://docs.qq.com/scenario/link.html?url={url}"
         im = [
             f"{game_title} 您的id为【{ev.user_id}】",
-            "请复制地址到浏览器打开",
+            "登录将刷新全部面板，无需立即刷新",
             f" {url}",
             "登录地址10分钟内有效",
         ]
@@ -244,7 +245,9 @@ async def code_login(bot: Bot, ev: Event, text: str, isPage=False):
 async def add_cookie(ev, token, did) -> Union[WavesUser, str, None]:
     ck_res = await deal.add_cookie(ev, token, did)
     if "成功" in ck_res:
-        user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, "cookie", token)
+        user = await WavesUser.get_user_by_attr(
+            ev.user_id, ev.bot_id, "cookie", token, game_id=WAVES_GAME_ID
+        )
         if user:
             data = await WavesBind.insert_waves_uid(ev.user_id, ev.bot_id, user.uid, ev.group_id, lenth_limit=9)
             if data == 0 or data == -2:

@@ -17,6 +17,7 @@ from ..version import XutheringWavesUID_version
 from ..utils.api.model import GachaLog
 from ..utils.waves_api import waves_api
 from ..utils.database.models import WavesUser
+from ..utils.api.api import WAVES_GAME_ID
 from ..wutheringwaves_config import PREFIX
 from .model_for_waves_plugin import WavesPluginGacha
 from ..utils.resource.RESOURCE_PATH import PLAYER_PATH
@@ -316,16 +317,23 @@ async def save_gachalogs(
 
 
 async def save_record_id(user_id, bot_id, uid, record_id):
-    user = await WavesUser.get_user_by_attr(user_id, bot_id, "uid", uid)
+    user = await WavesUser.get_user_by_attr(user_id, bot_id, "uid", uid, game_id=WAVES_GAME_ID)
     if user:
         if user.record_id == record_id:
             return
         await WavesUser.update_data_by_data(
-            select_data={"user_id": user_id, "bot_id": bot_id, "uid": uid},
+            select_data={
+                "user_id": user_id,
+                "bot_id": bot_id,
+                "uid": uid,
+                "game_id": WAVES_GAME_ID,
+            },
             update_data={"record_id": record_id},
         )
     else:
-        await WavesUser.insert_data(user_id, bot_id, record_id=record_id, uid=uid)
+        await WavesUser.insert_data(
+            user_id, bot_id, record_id=record_id, uid=uid, game_id=WAVES_GAME_ID
+        )
 
 
 async def import_gachalogs(ev: Event, history_url: str, type: str, uid: str, force_overwrite=False) -> str:
