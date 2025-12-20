@@ -39,6 +39,12 @@
       margin: 1rem 0;
     }
 
+    .countdown {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 1rem;
+    }
+
     a {
       display: inline-block;
       background-color: #3498db;
@@ -56,9 +62,33 @@
 </head>
 <body>
 <div class="container">
-  <h1>登录过期</h1>
-  <p>请重新发起登录请求</p>
-  <a href="https://github.com/Loping151/XutheringWavesUID">返回首页</a>
+  <h1>404</h1>
+  <p>页面不存在</p>
+  <p class="countdown">3秒后自动跳转</p>
+  <a href="https://mc.kurogames.com/main" id="redirectBtn">立即跳转</a>
 </div>
+
+<script>
+  let countdown = 3;
+  const countdownElement = document.querySelector('.countdown');
+  const redirectUrl = 'https://mc.kurogames.com/main';
+
+  function updateCountdown() {
+    countdownElement.textContent = `${countdown}秒后自动跳转`;
+    if (countdown <= 0) {
+      clearInterval(timer);
+      window.location.href = redirectUrl;
+    }
+    countdown--;
+  }
+
+  const timer = setInterval(updateCountdown, 1000);
+
+  document.getElementById('redirectBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    clearInterval(timer);
+    window.location.href = redirectUrl;
+  });
+</script>
 </body>
 </html>

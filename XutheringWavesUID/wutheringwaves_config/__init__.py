@@ -3,7 +3,7 @@ from gsuid_core.bot import Bot
 from gsuid_core.models import Event
 
 from .set_config import set_waves_user_value
-from .wutheringwaves_config import WutheringWavesConfig
+from .wutheringwaves_config import WutheringWavesConfig, ShowConfig
 from ..utils.database.models import WavesBind
 
 sv_self_config = SV("鸣潮配置")

@@ -15,6 +15,11 @@ DATA_PATH = get_res_path()
 PLAYERS_PATH = DATA_PATH / "XutheringWavesUID" / "players"
 BACKUP_PATH = DATA_PATH / "backup"
 
+# 此次迁移是直接把显示配置改为上传内容配置
+BG_PATH = DATA_PATH / "XutheringWavesUID" / "bg"
+if BG_PATH.exists():
+    shutil.move(str(BG_PATH), str(BG_PATH.parent / "show"))
+    logger.info("[XutheringWavesUID] 已将bg重命名为show以适应新配置")
 
 # 此次迁移是因为支持工坊抽卡记录，以防出现bug，先备份所有抽卡记录
 # if PLAYERS_PATH.exists():
@@ -39,7 +44,6 @@ BACKUP_PATH = DATA_PATH / "backup"
 #             logger.warning(f"[XutheringWavesUID] 备份抽卡记录失败 {player_dir.name}: {e}")
 #     if backup_count > 0:
 #         logger.info(f"[XutheringWavesUID] 抽卡记录备份完成，共 {backup_count} 个玩家")
-
 
 # 此次迁移是因为初次实现抽卡排行时，uid字段拿错导致的下划线连接多uid
 if PLAYERS_PATH.exists():
