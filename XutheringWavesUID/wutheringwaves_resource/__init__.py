@@ -121,6 +121,7 @@ async def startup():
     map_updated = copy_if_different(MAP_BUILD_TEMP, MAP_BUILD_PATH, "伤害计算资源")
     
     if build_updated or map_updated:
+        logger.info("[鸣潮] 构建文件已更新，正在重启...")
         from gsuid_core.buildin_plugins.core_command.core_restart.restart import (
             restart_genshinuid,
         )
