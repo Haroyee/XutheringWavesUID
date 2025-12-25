@@ -97,6 +97,7 @@ async def check_speed(plugin_name):
 
     return url, tag
 
+
 def get_target_package():
     system = sys.platform
     machine = platform.machine().lower()
@@ -152,8 +153,10 @@ async def download_all_resource(force: bool = False):
 
             shutil.rmtree(BUILD_TEMP, ignore_errors=True)
             shutil.rmtree(MAP_BUILD_TEMP, ignore_errors=True)
+            shutil.rmtree(MAP_CHAR_PATH, ignore_errors=True)
             BUILD_TEMP.mkdir(parents=True, exist_ok=True)
             MAP_BUILD_TEMP.mkdir(parents=True, exist_ok=True)
+            MAP_CHAR_PATH.mkdir(parents=True, exist_ok=True)
             
         plugin_name = "XutheringWavesUID"
         url, tag = await check_speed(plugin_name)
