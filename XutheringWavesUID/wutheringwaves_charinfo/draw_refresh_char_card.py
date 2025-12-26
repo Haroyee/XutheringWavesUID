@@ -173,7 +173,7 @@ async def draw_refresh_char_detail_img(
     await WavesBind.insert_waves_uid(user_id, ev.bot_id, uid, ev.group_id, lenth_limit=9)
 
     waves_map = {"refresh_update": {}, "refresh_unchanged": {}}
-    if ev.command == "面板":
+    if ev.command in ["面板", "面包", "🍞", "mb"]:
         all_waves_datas = await get_all_role_detail_info_list(uid)
         if not all_waves_datas:
             return "暂无面板数据", False

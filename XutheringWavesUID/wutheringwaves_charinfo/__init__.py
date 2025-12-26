@@ -51,7 +51,7 @@ TYPE_MAP = {
 
 
 @waves_upload_char.on_regex(
-    rf"^(?P<force>强制)?上传(?P<char>{PATTERN})(?P<type>面板|面包|🍞|体力|每日|mr|背景|bg)图$",
+    rf"^(?P<force>强制)?上传(?P<char>{PATTERN})(?P<type>面板|面包|🍞|card|体力|每日|mr|背景|bg)图$",
     block=True,
 )
 async def upload_char_img(bot: Bot, ev: Event):
@@ -68,7 +68,7 @@ async def upload_char_img(bot: Bot, ev: Event):
     )
     
 
-@waves_char_card_list.on_regex(rf"^(?P<char>{PATTERN})(?P<type>面板|面包|🍞|体力|每日|mr|背景|bg)图列表$", block=True)
+@waves_char_card_list.on_regex(rf"^(?P<char>{PATTERN})(?P<type>面板|面包|🍞|card|体力|每日|mr|背景|bg)图列表$", block=True)
 async def get_char_card_list(bot: Bot, ev: Event):
     char = ev.regex_dict.get("char")
     if not char:
@@ -77,7 +77,7 @@ async def get_char_card_list(bot: Bot, ev: Event):
 
 
 @waves_delete_char_card.on_regex(
-    rf"^删除(?P<char>{PATTERN})(?P<type>面板|面包|🍞|体力|背景)图(?P<hash_id>[a-zA-Z0-9,，]+)$", block=True
+    rf"^删除(?P<char>{PATTERN})(?P<type>面板|面包|🍞|体力|每日|mr|背景|bg)图(?P<hash_id>[a-zA-Z0-9,，]+)$", block=True
 )
 async def delete_char_card(bot: Bot, ev: Event):
     char = ev.regex_dict.get("char")
@@ -87,7 +87,7 @@ async def delete_char_card(bot: Bot, ev: Event):
     await delete_custom_card(bot, ev, char, hash_id, target_type=TYPE_MAP.get(ev.regex_dict.get("type"), "card"))
 
 
-@waves_delete_all_card.on_regex(rf"^删除全部(?P<char>{PATTERN})(?P<type>面板|面包|🍞|体力|每日|mr|背景|bg)图$", block=True)
+@waves_delete_all_card.on_regex(rf"^删除全部(?P<char>{PATTERN})(?P<type>面板|面包|🍞|card|体力|每日|mr|背景|bg)图$", block=True)
 async def delete_all_char_card(bot: Bot, ev: Event):
     char = ev.regex_dict.get("char")
     if not char:
@@ -117,7 +117,7 @@ async def repeated_char_card(bot: Bot, ev: Event):
 
 
 @waves_char_card_single.on_regex(
-    rf"^查看(?P<char>{PATTERN})(?P<type>面板|面包|🍞|体力|每日|mr|背景|bg)图(?P<hash_id>[a-zA-Z0-9]+)$",
+    rf"^查看(?P<char>{PATTERN})(?P<type>面板|面包|🍞|card|体力|每日|mr|背景|bg)图(?P<hash_id>[a-zA-Z0-9]+)$",
     block=True,
 )
 async def get_char_card_single(bot: Bot, ev: Event):
@@ -150,6 +150,8 @@ async def get_char_card_single(bot: Bot, ev: Event):
         "面板",
         "面包",
         "🍞",
+        "upd🍞",
+        "updmb",
         "mb",
     ),
     block=True,
@@ -170,7 +172,7 @@ async def send_card_info(bot: Bot, ev: Event):
 
 
 @waves_new_get_one_char_info.on_regex(
-    rf"^(?P<is_refresh>刷新|更新)(?P<char>{PATTERN})(?P<query_type>面板|面包|🍞|mb)$",
+    rf"^(?P<is_refresh>刷新|更新|upd)(?P<char>{PATTERN})(?P<query_type>面板|面包|🍞|mb)$",
     block=True,
 )
 async def send_one_char_detail_msg(bot: Bot, ev: Event):
@@ -238,7 +240,7 @@ async def send_char_detail_msg(bot: Bot, ev: Event):
 
 
 @waves_new_char_detail.on_regex(
-    rf"(?P<waves_id>\d+)?(?P<char>{PATTERN})(?P<query_type>面板|面包|🍞|伤害(?P<damage>(\d+)?))(?P<is_pk>pk|对比|PK|比|比较)?(\s*)?(?P<change_list>((换[^换]*)*)?)",
+    rf"(?P<waves_id>\d+)?(?P<char>{PATTERN})(?P<query_type>面板|面包|🍞|mb|伤害(?P<damage>(\d+)?))(?P<is_pk>pk|对比|PK|比|比较)?(\s*)?(?P<change_list>((换[^换]*)*)?)",
     block=True,
 )
 async def send_char_detail_msg2(bot: Bot, ev: Event):
