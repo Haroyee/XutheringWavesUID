@@ -13,7 +13,7 @@ from ..utils.database.models import WavesBind
 waves_role_info = SV("waves查询信息")
 
 
-@waves_role_info.on_fullmatch(("查询", "卡片"), block=True)
+@waves_role_info.on_fullmatch(("查询", "卡片", "kp"), block=True)
 async def send_role_info(bot: Bot, ev: Event):
     logger.info("[鸣潮]开始执行[查询信息]")
     user_id = ruser_id(ev)
