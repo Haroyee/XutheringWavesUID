@@ -48,6 +48,8 @@ async def add_cookie(ev: Event, ck: str, did: str, is_login: bool = False) -> st
                 return bat
 
             if user:
+                # is_login一旦为True就不应该被覆盖为False，使用OR逻辑
+                final_is_login = user.is_login or is_login
                 await WavesUser.update_data_by_data(
                     select_data={
                         "user_id": ev.user_id,
@@ -60,7 +62,7 @@ async def add_cookie(ev: Event, ck: str, did: str, is_login: bool = False) -> st
                         "status": "",
                         "platform": platform,
                         "game_id": WAVES_GAME_ID,
-                        "is_login": is_login,
+                        "is_login": final_is_login,
                     },
                 )
             else:
@@ -86,8 +88,13 @@ async def add_cookie(ev: Event, ck: str, did: str, is_login: bool = False) -> st
             )
 
             # 如果是登录模式，更新该uid和game_id对应的is_login为True的记录的token和did
-            if is_login and did:
-                await WavesUser.update_token_by_login(data.roleId, WAVES_GAME_ID, ck, did)
+            if user:
+                final_is_login = user.is_login or is_login
+                if final_is_login and did:
+                    await WavesUser.update_token_by_login(data.roleId, WAVES_GAME_ID, ck, did)
+            else:
+                if is_login and did:
+                    await WavesUser.update_token_by_login(data.roleId, WAVES_GAME_ID, ck, did)
 
             res = await WavesBind.insert_waves_uid(ev.user_id, ev.bot_id, data.roleId, ev.group_id, lenth_limit=9)
             if res == 0 or res == -2:
@@ -107,6 +114,8 @@ async def add_cookie(ev: Event, ck: str, did: str, is_login: bool = False) -> st
                 continue
             pgr_user = await WavesUser.get_user_by_attr(ev.user_id, ev.bot_id, "uid", data.roleId, game_id=PGR_GAME_ID)
             if pgr_user:
+                # is_login一旦为True就不应该被覆盖为False，使用OR逻辑
+                final_is_login = pgr_user.is_login or is_login
                 await WavesUser.update_data_by_data(
                     select_data={
                         "user_id": ev.user_id,
@@ -120,7 +129,7 @@ async def add_cookie(ev: Event, ck: str, did: str, is_login: bool = False) -> st
                         "platform": platform,
                         "did": did,
                         "game_id": PGR_GAME_ID,
-                        "is_login": is_login,
+                        "is_login": final_is_login,
                     },
                 )
             else:
@@ -136,8 +145,13 @@ async def add_cookie(ev: Event, ck: str, did: str, is_login: bool = False) -> st
                 )
 
             # 如果是登录模式，更新该uid和game_id对应的is_login为True的记录的token和did
-            if is_login and did:
-                await WavesUser.update_token_by_login(data.roleId, PGR_GAME_ID, ck, did)
+            if pgr_user:
+                final_is_login = pgr_user.is_login or is_login
+                if final_is_login and did:
+                    await WavesUser.update_token_by_login(data.roleId, PGR_GAME_ID, ck, did)
+            else:
+                if is_login and did:
+                    await WavesUser.update_token_by_login(data.roleId, PGR_GAME_ID, ck, did)
 
             res = await WavesBind.insert_uid(
                 ev.user_id,
