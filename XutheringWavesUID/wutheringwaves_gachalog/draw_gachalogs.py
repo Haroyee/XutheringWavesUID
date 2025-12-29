@@ -99,6 +99,18 @@ async def draw_card_help():
         ]
     )
 
+    pc = "\n".join(
+        [
+            "PC获取方式",
+            "1.打开游戏抽卡界面，点开换取记录",
+            "2.在鸣潮安装的目录下进入目录：`Wuthering Waves\\Wuthering Waves Game\\Client\\Saved\\Logs`",
+            "3.找到文件`Client.log`并用记事本打开",
+            "4.搜索关键字：aki-gm-resources.aki-game",
+            "5.复制一整行链接",
+            "\n",
+        ]
+    )
+
     android = "\n".join(
         [
             "安卓手机获取链接方式",
@@ -123,19 +135,7 @@ async def draw_card_help():
         ]
     )
 
-    pc = "\n".join(
-        [
-            "PC获取方式",
-            "1.打开游戏抽卡界面，点开换取记录",
-            "2.在鸣潮安装的目录下进入目录：`Wuthering Waves\\Wuthering Waves Game\\Client\\Saved\\Logs`",
-            "3.找到文件`Client.log`并用记事本打开",
-            "4.搜索关键字：aki-gm-resources.aki-game",
-            "5.复制一整行链接",
-            "\n",
-        ]
-    )
-
-    msg = [text, yun, android, ios, pc]
+    msg = [text, yun, pc, android, ios]
     return msg
 
 
