@@ -437,7 +437,8 @@ class Echo_6000060(EchoAbstract):
     def damage(self, attr: DamageAttribute, isGroup: bool = False):
         
         msg = "自身共鸣效率提升10%"
-        attr.add_energy_regen(0.1, self.name, msg)
+        attr.add_energy_regen(0.1)
+        attr.add_effect(title, msg)
         
         if attr.char_template == temp_atk:
             title = self.name
