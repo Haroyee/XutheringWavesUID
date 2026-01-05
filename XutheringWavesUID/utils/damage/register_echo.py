@@ -441,7 +441,6 @@ class Echo_6000060(EchoAbstract):
         attr.add_effect(title, msg)
         
         if attr.char_template == temp_atk:
-            
             msg = "全队角色攻击提升10%"
             attr.add_atk_percent(0.1, title, msg)
 
