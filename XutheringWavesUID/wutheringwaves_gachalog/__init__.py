@@ -228,8 +228,8 @@ async def delete_gacha_history(bot: Bot, ev: Event):
     if not uid.isdigit() or len(uid) != 9:
         return await bot.send(f"请附带特征码，例如【{PREFIX}删除抽卡记录123456789】")
 
-    _, ck = await waves_api.get_ck_result(uid, ev.user_id, ev.bot_id)
-    if not ck:
+    is_self, ck = await waves_api.get_ck_result(uid, ev.user_id, ev.bot_id)
+    if (not ck or not is_self) and not ev.user_pm == 0:
         return await bot.send(f"UID{uid}未登录或Cookie失效，不允许删除抽卡记录")
 
     player_dir = PLAYER_PATH / uid
