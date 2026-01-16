@@ -103,6 +103,7 @@ async def get_gacha_log_by_link(bot: Bot, ev: Event):
             # 导入合并后的数据
             merged_json_str = json.dumps(merged_data, ensure_ascii=False)
             im = await import_gachalogs(ev, merged_json_str, "json", uid, force_overwrite=True)
+            await bot.send("导入仅包含早于本地记录的部分，此后请使用链接导入更新数据，或删除抽卡记录后再次链接导入+合并！")
             return await bot.send(im)
 
         except Exception as e:
