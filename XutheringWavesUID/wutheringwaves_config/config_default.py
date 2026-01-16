@@ -218,4 +218,10 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "需自行安装签到插件、使用相同前缀并关闭签到插件的帮助",
         False,
     ),
+    "ActiveUserDays": GsIntConfig(
+        "活跃账号认定天数",
+        "在此天数内有使用记录的账号被认定为活跃账号",
+        42,
+        10000,
+    ),
 }

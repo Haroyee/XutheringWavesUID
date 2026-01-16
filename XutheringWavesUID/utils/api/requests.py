@@ -192,11 +192,15 @@ class WavesApi:
         if not data.success:
             if data.is_bat_token_invalid:
                 if waves_user := await self.refresh_bat_token(waves_user):
+                    # 更新最后使用时间
+                    await WavesUser.update_last_used_time(uid, user_id, bot_id, game_id=WAVES_GAME_ID)
                     return waves_user.cookie
             else:
                 await data.mark_cookie_invalid(uid, waves_user.cookie)
             return ""
 
+        # 更新最后使用时间
+        await WavesUser.update_last_used_time(uid, user_id, bot_id, game_id=WAVES_GAME_ID)
         return waves_user.cookie
 
     async def get_waves_random_cookie(self, uid: str, user_id: str) -> Optional[str]:

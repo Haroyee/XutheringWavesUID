@@ -402,6 +402,14 @@
         "need_ck": false,
         "need_sk": false,
         "need_admin": false
+      },
+      {
+        "name": "删除抽卡记录",
+        "desc": "删除抽卡记录",
+        "eg": "删除抽卡记录uid",
+        "need_ck": true,
+        "need_sk": false,
+        "need_admin": false
       }
     ]
   },
@@ -690,14 +698,6 @@
         "name": "添加/删除角色别名",
         "desc": "添加/删除角色别名",
         "eg": "添加油壶别名杂鱼",
-        "need_ck": false,
-        "need_sk": false,
-        "need_admin": true
-      },
-      {
-        "name": "删除抽卡记录",
-        "desc": "删除抽卡记录",
-        "eg": "删除抽卡记录uid",
         "need_ck": false,
         "need_sk": false,
         "need_admin": true
