@@ -29,29 +29,50 @@ async def get_guide(bot: Bot, ev: Event, char_name: str):
 
     config = WutheringWavesConfig.get_config("WavesGuide").data
 
+    # 获取群组排除的攻略提供方
+    excluded_providers = []
+    if ev.group_id:
+        from ..utils.guide_config import get_excluded_providers
+
+        excluded_providers = get_excluded_providers(ev.group_id)
+
     imgs_result = []
     pattern = re.compile(re.escape(char_name), re.IGNORECASE)
     if "all" in config:
         for guide_path in GUIDE_PATH.iterdir():
+            # 检查是否被排除
+            author_name = guide_author_map.get(guide_path.name, guide_path.name)
+            if author_name in excluded_providers:
+                continue
+
             imgs = await get_guide_pic(
                 guide_path,
                 pattern,
-                guide_author_map.get(guide_path.name, guide_path.name),
+                author_name,
             )
             if len(imgs) == 0:
                 continue
             imgs_result.extend(imgs)
     else:
         for guide_name in config:
+            # 检查是否被排除（这里 guide_name 可能是标准名称）
+            if guide_name in excluded_providers:
+                continue
+
             if guide_name in guide_map:
                 guide_path = GUIDE_PATH / guide_map[guide_name]
             else:
                 guide_path = GUIDE_PATH / guide_name
 
+            author_name = guide_author_map.get(guide_path.name, guide_path.name)
+            # 再次检查（以防路径名映射后的名称被排除）
+            if author_name in excluded_providers:
+                continue
+
             imgs = await get_guide_pic(
                 guide_path,
                 pattern,
-                guide_author_map.get(guide_path.name, guide_path.name),
+                author_name,
             )
             if len(imgs) == 0:
                 continue

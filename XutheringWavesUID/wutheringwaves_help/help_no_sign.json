@@ -607,6 +607,14 @@
                 "need_ck": false,
                 "need_sk": false,
                 "need_admin": true
+            },
+            {
+                "name": "排除攻略提供方",
+                "desc": "设置排除特定攻略提供方",
+                "eg": "设置排除攻略 作者1，作者2",
+                "need_ck": false,
+                "need_sk": false,
+                "need_admin": true
             }
         ]
     },

@@ -67,6 +67,48 @@ async def send_config_ev(bot: Bot, ev: Event):
         WutheringWavesConfig.set_config("WavesRankUseTokenGroup", list(WavesRankUseTokenGroup))
         WutheringWavesConfig.set_config("WavesRankNoLimitGroup", list(WavesRankNoLimitGroup))
         return await bot.send((" " if at_sender else "") + msg, at_sender)
+    elif "排除攻略" in ev.text:
+        if ev.user_pm > 3:
+            msg = "[鸣潮] 排除攻略设置需要群管理才可设置"
+            return await bot.send((" " if at_sender else "") + msg, at_sender)
+        if not ev.group_id:
+            msg = "[鸣潮] 请使用群聊进行设置"
+            return await bot.send((" " if at_sender else "") + msg, at_sender)
+
+        from ..utils.guide_config import (
+            load_guide_config,
+            save_guide_config,
+            parse_provider_names,
+        )
+
+        # 提取攻略提供方名称
+        provider_text = ev.text.replace("排除攻略", "").strip()
+
+        guide_config = load_guide_config()
+
+        if not provider_text:
+            # 清空当前群的排除设置
+            if ev.group_id in guide_config:
+                del guide_config[ev.group_id]
+                save_guide_config(guide_config)
+            msg = f"[鸣潮] 群【{ev.group_id}】已清空排除攻略设置"
+            return await bot.send((" " if at_sender else "") + msg, at_sender)
+
+        # 解析提供方名称
+        providers = parse_provider_names(provider_text)
+        if not providers:
+            msg = "[鸣潮] 未识别到有效的攻略提供方名称"
+            return await bot.send((" " if at_sender else "") + msg, at_sender)
+
+        # 保存配置
+        guide_config[ev.group_id] = providers
+        save_guide_config(guide_config)
+
+        msg = (
+            f"[鸣潮] 群【{ev.group_id}】已设置排除攻略提供方:\n"
+            + "\n".join(f"  - {p}" for p in providers)
+        )
+        return await bot.send((" " if at_sender else "") + msg, at_sender)
     else:
         msg = "请输入正确的设置信息..."
         return await bot.send((" " if at_sender else "") + msg, at_sender)
