@@ -152,7 +152,7 @@ async def _fetch_image_bytes(url: str) -> Optional[bytes]:
         return None
 
 
-def _compute_orb_features_from_image(image: Image.Image) -> Optional[Tuple[np.ndarray, np.ndarray]]:
+def _compute_orb_features_from_image(image: Image.Image):
     if cv2 is None:
         return None
     rgb = np.array(image.convert("RGB"))
@@ -182,15 +182,10 @@ async def match_hash_id_from_event(
     best_path: Optional[Path] = None
     best_char_id: Optional[str] = None
 
-    if char_id:
-        char_dirs = [CUSTOM_PATH_MAP.get(target_type, CUSTOM_CARD_PATH) / f"{char_id}"]
-    else:
-        char_dirs = []
-        base = CUSTOM_PATH_MAP.get(target_type, CUSTOM_CARD_PATH)
-        if base.exists():
-            for d in base.iterdir():
-                if d.is_dir():
-                    char_dirs.append(d)
+    # 定义搜索顺序：先搜索目标类型，如果找不到则搜索其他类型
+    search_types = [target_type]
+    other_types = [t for t in ["card", "bg", "stamina"] if t != target_type]
+    search_types.extend(other_types)
 
     for url in urls:
         image_bytes = await _fetch_image_bytes(url)
@@ -222,20 +217,36 @@ async def match_hash_id_from_event(
         if feat_new is None:
             continue
 
-        for dir_path in char_dirs:
-            if not dir_path.exists():
-                continue
-            for img_path in _iter_images(dir_path):
-                feat_old = get_orb_features(img_path)
-                if feat_old is None:
+        # 按照类型顺序搜索
+        for current_type in search_types:
+            if char_id:
+                char_dirs = [CUSTOM_PATH_MAP.get(current_type, CUSTOM_CARD_PATH) / f"{char_id}"]
+            else:
+                char_dirs = []
+                base = CUSTOM_PATH_MAP.get(current_type, CUSTOM_CARD_PATH)
+                if base.exists():
+                    for d in base.iterdir():
+                        if d.is_dir():
+                            char_dirs.append(d)
+
+            for dir_path in char_dirs:
+                if not dir_path.exists():
                     continue
-                sim = _orb_similarity(feat_new, feat_old)
-                if sim is None:
-                    continue
-                if sim > best_sim:
-                    best_sim = sim
-                    best_path = img_path
-                    best_char_id = dir_path.name
+                for img_path in _iter_images(dir_path):
+                    feat_old = get_orb_features(img_path)
+                    if feat_old is None:
+                        continue
+                    sim = _orb_similarity(feat_new, feat_old)
+                    if sim is None:
+                        continue
+                    if sim > best_sim:
+                        best_sim = sim
+                        best_path = img_path
+                        best_char_id = dir_path.name
+
+            # 如果在当前类型找到了足够相似的结果，停止搜索其他类型
+            if best_sim >= ORB_THRESHOLD:
+                break
 
     if best_path is None or best_char_id is None:
         return None
@@ -283,7 +294,7 @@ def get_orb_dir_for_char(target_type: str, char_id: str) -> Path:
     return CUSTOM_ORB_PATH / target_type / str(char_id)
 
 
-def _load_orb_cache(image_path: Path) -> Optional[Tuple[np.ndarray, np.ndarray]]:
+def _load_orb_cache(image_path: Path):
     cache_path = _get_orb_cache_path(image_path)
     if not cache_path or not cache_path.exists():
         return None
@@ -303,7 +314,7 @@ def _load_orb_cache(image_path: Path) -> Optional[Tuple[np.ndarray, np.ndarray]]
         return None
 
 
-def _save_orb_cache(image_path: Path, pts: np.ndarray, des: np.ndarray) -> None:
+def _save_orb_cache(image_path: Path, pts, des) -> None:
     cache_path = _get_orb_cache_path(image_path)
     if not cache_path:
         return
@@ -320,7 +331,7 @@ def delete_orb_cache(image_path: Path) -> None:
             logger.warning(f"[鸣潮] 删除ORB缓存失败: {cache_path}")
 
 
-def _compute_orb_features(image_path: Path) -> Optional[Tuple[np.ndarray, np.ndarray]]:
+def _compute_orb_features(image_path: Path):
     if cv2 is None:
         return None
     img = cv2.imread(str(image_path), cv2.IMREAD_GRAYSCALE)
@@ -334,7 +345,7 @@ def _compute_orb_features(image_path: Path) -> Optional[Tuple[np.ndarray, np.nda
     return pts, descriptors
 
 
-def get_orb_features(image_path: Path) -> Optional[Tuple[np.ndarray, np.ndarray]]:
+def get_orb_features(image_path: Path):
     cached = _load_orb_cache(image_path)
     if cached is not None:
         return cached
@@ -355,8 +366,8 @@ def update_orb_cache(image_path: Path) -> None:
 
 
 def _orb_similarity(
-    feat1: Tuple[np.ndarray, np.ndarray],
-    feat2: Tuple[np.ndarray, np.ndarray],
+    feat1,
+    feat2,
     ratio: float = ORB_RATIO,
     min_matches: int = ORB_MIN_MATCHES,
 ) -> Optional[float]:
@@ -421,7 +432,7 @@ def find_duplicate_pairs_in_dir(
     images = list(_iter_images(dir_path))
     if len(images) < 2:
         return []
-    features: List[Tuple[Path, Tuple[np.ndarray, np.ndarray]]] = []
+    features = []
     for img_path in images:
         feat = get_orb_features(img_path)
         if feat is not None:
@@ -444,7 +455,7 @@ def find_duplicate_groups_in_dir(
     images = list(_iter_images(dir_path))
     if len(images) < 2:
         return []
-    features: List[Tuple[Path, Tuple[np.ndarray, np.ndarray]]] = []
+    features = []
     for img_path in images:
         feat = get_orb_features(img_path)
         if feat is not None:
@@ -471,7 +482,7 @@ def find_duplicates_for_new_images(
     threshold: float = ORB_THRESHOLD,
 ) -> Dict[Path, List[Tuple[Path, float]]]:
     existing = [p for p in _iter_images(dir_path) if p not in new_images]
-    existing_feats: Dict[Path, Tuple[np.ndarray, np.ndarray]] = {}
+    existing_feats = {}
     for p in existing:
         feat = get_orb_features(p)
         if feat is not None:

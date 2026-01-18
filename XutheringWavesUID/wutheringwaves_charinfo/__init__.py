@@ -139,7 +139,7 @@ async def repeated_char_card(bot: Bot, ev: Event):
 
 
 @waves_char_card_single.on_regex(
-    rf"^(查看|提取)(?P<char>{PATTERN})?(?P<type>面板|面包|🍞|card|体力|每日|mr|背景|bg)图(?P<hash_id>[a-zA-Z0-9]+)?$",
+    rf"^(查看|提取|获取)(?P<char>{PATTERN})?(?P<type>面板|面包|🍞|card|体力|每日|mr|背景|bg)图(?P<hash_id>[a-zA-Z0-9]+)?$",
     block=True,
 )
 async def get_char_card_single(bot: Bot, ev: Event):

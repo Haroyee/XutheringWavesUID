@@ -218,6 +218,11 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         "需自行安装签到插件、使用相同前缀并关闭签到插件的帮助",
         False,
     ),
+    "HelpExtraModules": GsListStrConfig(
+        "帮助显示额外模块（重启生效）",
+        "在帮助中额外显示的模块：todayecho(梭哈)、scoreecho(评分)，需自行安装对应插件",
+        [],
+    ),
     "ActiveUserDays": GsIntConfig(
         "活跃账号认定天数",
         "在此天数内有使用记录的账号被认定为活跃账号",
