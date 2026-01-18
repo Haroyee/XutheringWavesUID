@@ -585,7 +585,7 @@ async def draw_char_detail_img(
 
     char_id = char_name_to_char_id(char)
     if not char_id:
-        return f"[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
+        return f"未找到指定角色, 请检查输入是否正确！"
 
     char_name = alias_to_char_name(char)
 
@@ -1016,7 +1016,7 @@ async def draw_char_score_img(ev: Event, uid: str, char: str, user_id: str, wave
 
     char_id = char_name_to_char_id(char)
     if not char_id:
-        return f"[鸣潮] 角色名【{char}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
+        return f"未找到指定角色, 请检查输入是否正确！"
     char_name = alias_to_char_name(char)
 
     ck = ""

@@ -12,7 +12,7 @@ sv_self_config = SV("鸣潮配置")
 PREFIX = get_plugin_available_prefix("XutheringWavesUID")
 
 
-@sv_self_config.on_prefix("设置")
+@sv_self_config.on_prefix("设置", block=True)
 async def send_config_ev(bot: Bot, ev: Event):
     at_sender = True if ev.group_id else False
 

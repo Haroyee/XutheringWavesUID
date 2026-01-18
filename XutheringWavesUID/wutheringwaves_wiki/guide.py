@@ -6,7 +6,7 @@ from gsuid_core.logger import logger
 from gsuid_core.models import Event
 from gsuid_core.utils.image.convert import convert_img
 
-from ..utils.name_convert import alias_to_char_name
+from ..utils.name_convert import alias_to_char_name_optional
 from ..utils.resource.RESOURCE_PATH import GUIDE_PATH
 from ..wutheringwaves_config.wutheringwaves_config import WutheringWavesConfig
 
@@ -24,7 +24,12 @@ guide_author_map = {v: k for k, v in guide_map.items()}
 
 
 async def get_guide(bot: Bot, ev: Event, char_name: str):
-    char_name = alias_to_char_name(char_name)
+    char_name = alias_to_char_name_optional(char_name)
+    
+    if not char_name:
+        msg = f"[鸣潮] 未找到指定角色, 请检查输入是否正确！"
+        return await bot.send(msg)
+    
     logger.info(f"[鸣潮] 开始获取{char_name}图鉴")
 
     config = WutheringWavesConfig.get_config("WavesGuide").data
@@ -77,7 +82,7 @@ async def get_guide(bot: Bot, ev: Event, char_name: str):
             imgs_result.extend(imgs)
 
     if len(imgs_result) == 0:
-        msg = f"[鸣潮] 攻略【{char_name}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
+        msg = f"[鸣潮]【{char_name}】暂无攻略！"
         return await bot.send(msg)
 
     await send_guide(config, imgs_result, bot)

@@ -15,13 +15,13 @@ from ..wutheringwaves_abyss.period import (
     get_slash_period_number,
 )
 
-sv_waves_guide = SV("鸣潮攻略")
+sv_waves_guide = SV("鸣潮攻略", priority=10)
 sv_waves_tower = SV("waves查询深塔信息", priority=4)
 sv_waves_slash_info = SV("waves查询海墟信息", priority=4)
 
 
 @sv_waves_guide.on_regex(
-    rf"^(?P<wiki_name>{PATTERN})(?P<wiki_type>共鸣链|gml|命座|天赋|技能|jn|图鉴|wiki|介绍|回路|操作|机制|jz)$",
+    rf"^(?P<wiki_name>{PATTERN})(?P<wiki_type>共鸣链|gml|命座|天赋|技能|jn|图鉴|专武|wiki|介绍|回路|操作|机制|jz)$",
     block=True,
 )
 async def send_waves_wiki(bot: Bot, ev: Event):
@@ -51,6 +51,8 @@ async def send_waves_wiki(bot: Bot, ev: Event):
             return await bot.send(msg, at_sender)
         await bot.send(img)
     else:
+        if wiki_type == "专武":
+            wiki_name = wiki_name + "专武"
         img = await draw_wiki_weapon(wiki_name)
         if isinstance(img, str) or not img:
             echo_name = wiki_name
@@ -68,14 +70,7 @@ async def send_waves_wiki(bot: Bot, ev: Event):
 async def send_role_guide_pic(bot: Bot, ev: Event):
     char_name = ev.regex_dict.get("char", "")
     if "设置排除" in char_name:
-        # 排除攻略提供方 设置指令，不处理
         return
-
-    # char_id = char_name_to_char_id(char_name)
-    # at_sender = True if ev.group_id else False
-    # if not char_id:
-    #     msg = f"[鸣潮] 角色名【{char_name}】无法找到, 可能暂未适配, 请先检查输入是否正确！\n"
-    #     return await bot.send(msg, at_sender)
 
     await get_guide(bot, ev, char_name)
 
