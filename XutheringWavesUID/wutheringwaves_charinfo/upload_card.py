@@ -91,13 +91,13 @@ async def upload_custom_card(
                     if target_type in ["card", "stamina"]:
                         # 面板图和体力图：宽大于高则拒绝
                         if w > h:
-                            size_check_failed.append(f"第{index}张图片尺寸不合适（宽{w} > 高{h}），面板图和体力图需要竖版图片（宽 ≤ 高）")
+                            size_check_failed.append(f"第{index}张图片尺寸错误，面板图和体力图需要竖版图片（宽 ≤ 高）")
                             temp_path.unlink()
                             continue
                     elif target_type == "bg":
                         # 背景图：高大于宽则拒绝
                         if h > w:
-                            size_check_failed.append(f"第{index}张图片尺寸不合适（高{h} > 宽{w}），背景图需要横版图片（高 ≤ 宽）")
+                            size_check_failed.append(f"第{index}张图片尺寸错误，背景图需要横版图片（高 ≤ 宽）")
                             temp_path.unlink()
                             continue
             except Exception as e:
