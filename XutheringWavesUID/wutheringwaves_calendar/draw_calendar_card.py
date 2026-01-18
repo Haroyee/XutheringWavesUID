@@ -266,6 +266,21 @@ async def draw_calendar_img(ev: Event, uid: str):
             _high += event_high
 
     img = add_footer(img)
+
+    kuro_calendar_path = CALENDAR_PATH / "calendar.png"
+    if kuro_calendar_path.exists():
+        try:
+            custom_calendar = Image.open(kuro_calendar_path).convert("RGBA")
+            calendar_width = int(custom_calendar.width * img.height / custom_calendar.height)
+            custom_calendar = custom_calendar.resize((calendar_width, img.height), Image.Resampling.LANCZOS)
+
+            new_img = Image.new("RGBA", (img.width + custom_calendar.width, img.height), (255, 255, 255, 0))
+            new_img.paste(img, (0, 0))
+            new_img.paste(custom_calendar, (img.width, 0), custom_calendar)
+            img = new_img
+        except Exception:
+            pass
+
     img = await convert_img(img)
     return img
 
