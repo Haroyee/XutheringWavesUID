@@ -17,7 +17,6 @@ from gsuid_core.utils.database.base_models import (
 from gsuid_core.utils.database.models import Subscribe
 
 from .waves_subscribe import WavesSubscribe
-from ...wutheringwaves_config import WutheringWavesConfig
 
 exec_list.extend(
     [
@@ -331,6 +330,7 @@ class WavesUser(User, table=True):
         import time
 
         # 获取活跃天数配置
+        from ...wutheringwaves_config import WutheringWavesConfig
         active_days = WutheringWavesConfig.get_config("ActiveUserDays").data
         current_time = int(time.time())
         threshold_time = current_time - (active_days * 24 * 60 * 60)
