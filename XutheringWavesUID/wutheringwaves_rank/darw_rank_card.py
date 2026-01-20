@@ -335,7 +335,8 @@ async def draw_rank_img(bot: Bot, ev: Event, char: str, rank_type: str) -> Union
     logger.info(f"[get_rank_info_for_user] start: {start_time}")
     # 获取群里的所有拥有该角色人的数据
     users = await WavesBind.get_group_all_uid(ev.group_id)
-    users = await filter_active_group_users(list(users), ev.bot_id, ev.bot_self_id)
+    if WutheringWavesConfig.get_config("RankActiveFilterGroup").data:
+        users = await filter_active_group_users(list(users), ev.bot_id, ev.bot_self_id)
 
     tokenLimitFlag, wavesTokenUsersMap = await get_waves_token_condition(ev)
     if not users:

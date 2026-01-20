@@ -60,6 +60,23 @@ class WavesBind(Bind, table=True):
         return result.all()
 
     @classmethod
+    @with_session
+    async def get_binds_by_uid(
+        cls: Type[T_WavesBind],
+        session: AsyncSession,
+        uid: str,
+    ) -> List[T_WavesBind]:
+        """根据鸣潮UID或战双UID查找绑定记录（含包含匹配）"""
+        stmt = select(cls).where(
+            or_(
+                col(cls.uid).contains(uid),
+                col(cls.pgr_uid).contains(uid),
+            )
+        )
+        result = await session.execute(stmt)
+        return list(result.scalars().all())
+
+    @classmethod
     async def insert_waves_uid(
         cls: Type[T_WavesBind],
         user_id: str,

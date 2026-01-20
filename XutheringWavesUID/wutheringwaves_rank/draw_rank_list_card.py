@@ -343,7 +343,8 @@ async def draw_rank_list(bot: Bot, ev: Event, threshold: int = 175) -> Union[str
 
     # 获取群里的所有用户
     users = await WavesBind.get_group_all_uid(ev.group_id)
-    users = await filter_active_group_users(list(users), ev.bot_id, ev.bot_self_id)
+    if WutheringWavesConfig.get_config("RankActiveFilterGroup").data:
+        users = await filter_active_group_users(list(users), ev.bot_id, ev.bot_self_id)
     if not users:
         msg = []
         msg.append(f"[鸣潮] 群【{ev.group_id}】暂无练度排行数据")

@@ -235,4 +235,9 @@ CONFIG_DEFAULT: Dict[str, GSC] = {
         42,
         3650,
     ),
+    "RankActiveFilterGroup": GsBoolConfig(
+        "群排行仅活跃用户",
+        "群排行（角色/练度/抽卡）是否仅统计活跃账号",
+        True,
+    ),
 }

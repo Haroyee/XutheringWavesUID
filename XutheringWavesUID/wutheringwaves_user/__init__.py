@@ -18,6 +18,7 @@ from ..wutheringwaves_user.login_succ import login_success_msg
 waves_bind_uid = SV("鸣潮绑定特征码", priority=10)
 waves_add_ck = SV("鸣潮添加token", priority=3)
 waves_del_ck = SV("鸣潮删除token", priority=3)
+waves_del_mem = SV("鸣潮删除群成员", priority=3)
 waves_get_ck = SV("waves获取ck", area="DIRECT")
 waves_del_all_invalid_ck = SV("鸣潮删除无效token", priority=1, pm=1)
 waves_refresh_bind = SV("waves刷新绑定", priority=5)
@@ -112,6 +113,47 @@ async def delete_all_invalid_cookie(bot: Bot, ev: Event):
     del_len = await WavesUser.delete_all_invalid_cookie()
     msg = f"[鸣潮] 已删除无效token【{del_len}】个"
     await bot.send((" " if at_sender else "") + msg, at_sender)
+
+
+@waves_del_mem.on_regex(("^删除群成员\\s*(?:[uU][iI][dD])?\\s*(?P<uid>\\d+)$",), block=True)
+async def waves_delete_group_member(bot: Bot, ev: Event):
+    if not ev.group_id:
+        return await bot.send("[鸣潮] 该命令仅限群聊使用")
+
+    if ev.user_pm is None or ev.user_pm > 3:
+        return await bot.send("[鸣潮] 需要群管理才可删除")
+
+    target_uid = ev.regex_dict.get("uid") if hasattr(ev, "regex_dict") else None
+    if not target_uid:
+        return await bot.send(f"[鸣潮] 格式错误，例如：{PREFIX}删除群成员123456789（游戏UID）")
+    binds = await WavesBind.get_binds_by_uid(target_uid)
+    if not binds:
+        return await bot.send(f"[鸣潮] 未找到 UID {target_uid} 的绑定记录")
+
+    updated = 0
+    for bind in binds:
+        uid_list = [u for u in (bind.uid or "").split("_") if u]
+        pgr_uid_list = [u for u in (bind.pgr_uid or "").split("_") if u]
+        if target_uid not in uid_list and target_uid not in pgr_uid_list:
+            continue
+
+        group_list = [g for g in (bind.group_id or "").split("_") if g]
+        if ev.group_id not in group_list:
+            continue
+
+        group_list = [g for g in group_list if g != ev.group_id]
+        new_group_id = "_".join(group_list)
+        await WavesBind.update_data(
+            user_id=bind.user_id,
+            bot_id=bind.bot_id,
+            **{"group_id": new_group_id},
+        )
+        updated += 1
+
+    if updated == 0:
+        return await bot.send(f"[鸣潮] UID {target_uid} 在本群无绑定记录")
+
+    return await bot.send(f"[鸣潮] 已移除 UID {target_uid} 在本群的 {updated} 条绑定记录")
 
 
 @scheduler.scheduled_job("cron", hour=23, minute=30)
