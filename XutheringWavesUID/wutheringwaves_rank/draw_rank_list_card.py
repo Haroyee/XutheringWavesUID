@@ -296,9 +296,13 @@ async def get_all_rank_list_info(
                 valid_role_details = []
                 char_list_data = {}
 
+                from ..utils.resource.constant import SPECIAL_CHAR_RANK_MAP
+
                 for role_detail in role_details:
                     phantom_score = calculate_role_phantom_score(role_detail)
-                    char_list_data[str(role_detail.role.roleId)] = phantom_score
+                    role_id_str = str(role_detail.role.roleId)
+                    mapped_id = SPECIAL_CHAR_RANK_MAP.get(role_id_str, role_id_str)
+                    char_list_data[mapped_id] = phantom_score
 
                     # 只计算分数>=阈值的角色
                     if phantom_score >= threshold:
