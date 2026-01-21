@@ -40,6 +40,7 @@ exec_list.extend(
         "UPDATE WavesUser SET game_id = 3 WHERE game_id IS NULL",
         "ALTER TABLE WavesUser DROP COLUMN pgr_sign_switch",
         "ALTER TABLE WavesUser DROP COLUMN pgr_uid",
+        "DELETE FROM WavesStaminaRecord WHERE id NOT IN (SELECT MAX(id) FROM WavesStaminaRecord GROUP BY user_id, bot_id, uid)",
     ]
 )
 
@@ -516,7 +517,6 @@ class WavesStaminaRecord(BaseModel, table=True):
             and_(
                 cls.user_id == user_id,
                 cls.bot_id == bot_id,
-                cls.bot_self_id == bot_self_id,
                 cls.uid == uid,
             )
         )
@@ -524,6 +524,7 @@ class WavesStaminaRecord(BaseModel, table=True):
         record = result.scalars().first()
 
         if record:
+            record.bot_self_id = bot_self_id
             record.mr_query_time = mr_query_time
             record.mr_value = mr_value
             record.is_ck_valid = is_ck_valid
@@ -558,7 +559,6 @@ class WavesStaminaRecord(BaseModel, table=True):
             and_(
                 cls.user_id == user_id,
                 cls.bot_id == bot_id,
-                cls.bot_self_id == bot_self_id,
                 cls.uid == uid,
             )
         )
@@ -566,6 +566,7 @@ class WavesStaminaRecord(BaseModel, table=True):
         record = result.scalars().first()
 
         if record:
+            record.bot_self_id = bot_self_id
             record.is_ck_valid = is_ck_valid
             session.add(record)
             return True
