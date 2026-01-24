@@ -86,7 +86,7 @@ async def calculate_score(uid: str, ck: str) -> Optional[Dict]:
             "name": role.roleName,
             "icon_url": avatar_b64,
             "score": total_score,
-            "detail": f"基础100分 + {chain_num}链×100",
+            "detail": f"100+{chain_num}链×100" if chain_num > 0 else "100",
             "chain_num": chain_num
         })
 
