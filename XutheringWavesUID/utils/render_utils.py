@@ -34,9 +34,11 @@ def _import_playwright():
         from playwright.async_api import async_playwright
         return async_playwright
     except ImportError:
-        logger.warning("[鸣潮] 未安装 playwright，无法使用渲染公告、wiki图等功能。")
-        logger.info("[鸣潮] 安装方法 Linux/Mac: 在当前目录下执行 source .venv/bin/activate && uv pip install playwright && uv run playwright install chromium")
-        logger.info("[鸣潮] 安装方法 Windows: 在当前目录下执行 .venv\\Scripts\\activate; uv pip install playwright; uv run playwright install chromium")
+        if not WutheringWavesConfig.get_config("RemoteRenderEnable").data:
+            logger.warning("[鸣潮] 未安装 playwright，无法使用渲染公告、wiki图等功能。")
+            logger.warning("[鸣潮] 可选择配置外置渲染方法！")
+            logger.info("[鸣潮] 安装方法 Linux/Mac: 在当前目录下执行 source .venv/bin/activate && uv pip install playwright && uv run playwright install chromium")
+            logger.info("[鸣潮] 安装方法 Windows: 在当前目录下执行 .venv\\Scripts\\activate; uv pip install playwright; uv run playwright install chromium")
         return None
 
 
