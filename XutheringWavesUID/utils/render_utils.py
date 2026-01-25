@@ -330,7 +330,7 @@ def get_footer_b64(footer_type: str = "black") -> Optional[str]:
         return None
 
 
-async def get_image_b64_with_cache(url: str, cache_path: Path, quality: int = 75) -> str:
+async def get_image_b64_with_cache(url: str, cache_path: Path, quality = None) -> str:
     if not url:
         return ""
 
@@ -343,6 +343,17 @@ async def get_image_b64_with_cache(url: str, cache_path: Path, quality: int = 75
 
         filename = url.split("/")[-1]
         local_path = cache_path / filename
+
+        # 如果 quality 为 None，不压缩，直接返回原始图片的 base64
+        if quality is None:
+            ext = local_path.suffix.lstrip(".").lower()
+            if ext == "jpg":
+                ext = "jpeg"
+            with open(local_path, "rb") as f:
+                data = f.read()
+            b64_str = f"data:image/{ext};base64,{base64.b64encode(data).decode('utf-8')}"
+            logger.debug(f"[渲染工具] 图片未压缩: {filename}, 大小: {len(data)} bytes")
+            return b64_str
 
         img = Image.open(local_path)
 

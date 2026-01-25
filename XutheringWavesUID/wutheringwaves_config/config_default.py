@@ -5,22 +5,10 @@ from gsuid_core.utils.plugins_config.models import (
     GsIntConfig,
     GsStrConfig,
     GsBoolConfig,
-    GsDictConfig,
-    GsListConfig,
     GsListStrConfig,
 )
 
 CONFIG_DEFAULT: Dict[str, GSC] = {
-    "WavesAnnGroups": GsDictConfig(
-        "推送公告群组",
-        "鸣潮公告推送群组",
-        {},
-    ),
-    "WavesAnnNewIds": GsListConfig(
-        "推送公告ID",
-        "鸣潮公告推送ID列表",
-        [],
-    ),
     "WavesAnnOpen": GsBoolConfig(
         "公告推送总开关",
         "公告推送总开关",
