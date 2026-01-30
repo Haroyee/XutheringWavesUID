@@ -17,7 +17,7 @@ jobs:
     steps:
 
     - name: Mirror the Github organization repos to Gitee.
-      uses: Yikun/hub-mirror-action@v1.0
+      uses: Yikun/hub-mirror-action@master
       with:
         src: github/Loping151 # 必选，需要同步的Github用户（源）
         dst: gitee/poida # 必选，需要同步到的Gitee的用户（目的）
