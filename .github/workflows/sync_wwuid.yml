@@ -29,7 +29,7 @@ jobs:
           dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
           dst_token: ${{ secrets.GITEE_TOKEN }}
           # 要同步的仓库名（必填，多个用逗号分隔）
-          static_list: "XutheringWavesUID"
+          static_list: "XutheringWavesUID,RoverSign"
           # 可选配置：强制同步（覆盖 Gitee 冲突）、同步分支/标签
           force_update: true
           debug: true  # 调试模式，可查看同步日志
