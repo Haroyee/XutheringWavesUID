@@ -1,23 +1,17 @@
 name: Mirror to Gitee
 on:
-  # 触发条件：push 代码、定时同步（每天 0 点）、手动触发
-  push:
-    branches: [ "main", "main" ]  # 同步指定分支（根据仓库实际分支名调整）
+  push: # 有 push 代码的时候会执行
+    branches: [ main ]
+  pull_request: # 有 pull_request 代码的时候会执行
+    branches: [ main ]
   schedule:
     - cron: '0 0 * * *'  # 每天 UTC 时间 0 点同步（对应北京时间 8 点）
   workflow_dispatch:  # 允许手动触发同步
 
 jobs:
-  mirror-to-gitee:
+  build:
     runs-on: ubuntu-latest
     steps:
-      # 步骤 1：检出 GitHub 仓库代码
-      - name: Checkout source code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 拉取所有历史提交，确保同步完整
-
-      # 步骤 2：使用 Hub Mirror Action 同步到 Gitee
       - name: Mirror to Gitee
         uses: Yikun/hub-mirror-action@master
         with:
