@@ -1,17 +1,39 @@
-# .github/workflows/sync.yml
-name: Sync Fork
-
+name: Mirror to Gitee
 on:
-  push: # push 时触发, 主要是为了测试配置有没有问题
+  # 触发条件：push 代码、定时同步（每天 0 点）、手动触发
+  push:
+    branches: [ "main", "main" ]  # 同步指定分支（根据仓库实际分支名调整）
   schedule:
-    - cron: '0 0 * * *' # 每3小时触发, 对于一些更新不那么频繁的项目可以设置为每天一次, 低碳一点
+    - cron: '0 0 * * *'  # 每天 UTC 时间 0 点同步（对应北京时间 8 点）
+  workflow_dispatch:  # 允许手动触发同步
+
 jobs:
-  repo-sync:
+  mirror-to-gitee:
     runs-on: ubuntu-latest
     steps:
-      - uses: TG908/fork-sync@v1.6.3
+      # 步骤 1：检出 GitHub 仓库代码
+      - name: Checkout source code
+        uses: actions/checkout@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          owner: ZhaoUncle # fork 的上游仓库 user
-          head: main # fork 的上游仓库 branch
-          base: main # 本地仓库 branch
+          fetch-depth: 0  # 拉取所有历史提交，确保同步完整
+
+      # 步骤 2：使用 Hub Mirror Action 同步到 Gitee
+      - name: Mirror to Gitee
+        uses: Yikun/hub-mirror-action@master
+        with:
+          # 源仓库（GitHub）
+          src: github/Loping151
+          # 目标仓库（Gitee）
+          dst: gitee/poida
+          # 仓库名（和 GitHub 一致）
+          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+          dst_token: ${{ secrets.GITEE_TOKEN }}
+          # 要同步的仓库名（必填，多个用逗号分隔）
+          static_list: "XutheringWavesUID"
+          # 可选配置：强制同步（覆盖 Gitee 冲突）、同步分支/标签
+          force_update: true
+          debug: true  # 调试模式，可查看同步日志
+          # 同步所有分支（默认仅同步默认分支）
+          sync_branch: true
+          # 同步所有标签
+          sync_tag: true
